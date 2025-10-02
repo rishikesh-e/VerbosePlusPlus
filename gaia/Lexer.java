@@ -7,6 +7,7 @@ public class Lexer {
     String text;
     int pos = 0;
     char currentChar;
+    
     public Lexer(String text) {
         this.text = text;
         currentChar = text.charAt(pos);
@@ -37,6 +38,7 @@ public class Lexer {
                     case "if" -> tokens.add(new Token(TokenType.IF, word));
                     case "else" -> tokens.add(new Token(TokenType.ELSE, word));
                     case "terminal" -> tokens.add(new Token(TokenType.IDENTIFIER, word));
+                    case "for" -> tokens.add(new Token(TokenType.FOR, word));
                     default -> tokens.add(new Token(TokenType.IDENTIFIER, word));
                 }
             }
@@ -54,10 +56,7 @@ public class Lexer {
                 advance();
                 if (currentChar == '=') { tokens.add(new Token(TokenType.ASSIGN, ":=")); advance(); }
             }
-            else if (currentChar == '"') {
-                tokens.add(new Token(TokenType.STRING, string()));
-            }
-            // Operators
+            else if (currentChar == '"') { tokens.add(new Token(TokenType.STRING, string())); }
             else if (currentChar == '+') { tokens.add(new Token(TokenType.PLUS, "+")); advance(); }
             else if (currentChar == '-') { tokens.add(new Token(TokenType.MINUS, "-")); advance(); }
             else if (currentChar == '*') { tokens.add(new Token(TokenType.MUL, "*")); advance(); }

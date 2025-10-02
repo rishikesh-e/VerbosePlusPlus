@@ -56,10 +56,11 @@ public class Parser {
                 currentToken.value.equals("terminal")) {
             return parsePrintStatement();
         }
-
+        if (currentToken.type == TokenType.FOR) {
+            return parseForLoop();
+        }
         throw new RuntimeException("Unexpected token " + currentToken);
     }
-
 
     private AST parseVariableDeclaration() {
         advance();
@@ -75,18 +76,28 @@ public class Parser {
         return new VariableDeclaration(type, name, value);
     }
 
+    private AST parseVariableDeclarationForLoop() {
+        advance();
+        expected(TokenType.LPAREN);
+        String type = currentToken.value;
+        advance();
+        expected(TokenType.RPAREN);
+        String name = currentToken.value;
+        advance();
+        expected(TokenType.ASSIGN);
+        AST value = parseExpression();
+        return new VariableDeclaration(type, name, value);
+    }
+
     private AST parseConditional() {
         advance();
         AST condition = parseExpression();
-
         expected(TokenType.LBRACE);
-
         List<AST> ifBranch = new ArrayList<>();
         while (currentToken.type != TokenType.RBRACE) {
             ifBranch.add(parseStatement());
         }
         expected(TokenType.RBRACE);
-
         List<AST> elseBranch = new ArrayList<>();
         if (currentToken.type == TokenType.ELSE) {
             advance();
@@ -96,10 +107,8 @@ public class Parser {
             }
             expected(TokenType.RBRACE);
         }
-
         return new IfStatement(condition, ifBranch, elseBranch);
     }
-
 
     private AST parseExpression() {
         AST left = parseTerm();
@@ -148,7 +157,6 @@ public class Parser {
         expected(TokenType.DOT);
         expected(TokenType.IDENTIFIER);
         expected(TokenType.LPAREN);
-
         AST value;
         if(currentToken.type == TokenType.STRING) {
             value = new Str(currentToken.value);
@@ -156,11 +164,43 @@ public class Parser {
         } else {
             value = parseExpression();
         }
-
         expected(TokenType.RPAREN);
         expected(TokenType.SEMICOLON);
-
         return new PrintStatement(value);
     }
 
+    private AST parseForLoop() {
+        advance();
+        expected(TokenType.LPAREN);
+        AST initialization = parseVariableDeclarationForLoop();
+        expected(TokenType.SEMICOLON);
+        AST condition = parseExpression();
+        expected(TokenType.SEMICOLON);
+        AST update = parseAssignmentForLoop();
+        expected(TokenType.RPAREN);
+        expected(TokenType.LBRACE);
+        List<AST> block = new ArrayList<>();
+        while(currentToken.type != TokenType.RBRACE) {
+            block.add(parseStatement());
+        }
+        expected(TokenType.RBRACE);
+        return new ForLoop(initialization, condition, update, block);
+    }
+
+    private AST parseAssignmentForLoop() {
+        String name = currentToken.value;
+        advance();
+        expected(TokenType.ASSIGN);
+        AST value = parseExpression();
+        return new Assignment(name, value);
+    }
+
+    private AST parseAssignment() {
+        String name = currentToken.value;
+        advance();
+        expected(TokenType.ASSIGN);
+        AST value = parseExpression();
+        expected(TokenType.SEMICOLON);
+        return new Assignment(name, value);
+    }
 }

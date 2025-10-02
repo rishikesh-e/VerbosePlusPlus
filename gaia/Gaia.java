@@ -9,7 +9,6 @@ public class Gaia {
                 variable(int) a := 10;
                 variable(int) b := 20;
                 variable(int) c := 15;
-                
                 if a > b {
                     if a > c {
                         terminal.print("a is greatest");
@@ -23,7 +22,9 @@ public class Gaia {
                         terminal.print("c is greatest");
                     }
                 }
-                
+                for(variable(int) i := 1; i < 5; i := i + 1) {
+                    terminal.print(i/2);
+                }
         """;
 
         Lexer lexer = new Lexer(code);

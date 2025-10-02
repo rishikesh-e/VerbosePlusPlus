@@ -13,18 +13,21 @@ public class Interpreter {
     }
 
     private void execute(AST statement) {
-        if (!(statement instanceof VariableDeclaration)) {
-            if (statement instanceof PrintStatement) {
-                runPrintStatement((PrintStatement) statement);
-            } else if (statement instanceof IfStatement) {
-                runIfStatement((IfStatement) statement);
-            } else {
-                throw new RuntimeException("Unknown statement statement: " + statement.getClass().getSimpleName());
-            }
-        } else {
+        if (statement instanceof VariableDeclaration) {
             runVariableDeclaration((VariableDeclaration) statement);
+        } else if (statement instanceof Assignment) {
+            runAssignment((Assignment) statement);
+        } else if (statement instanceof PrintStatement) {
+            runPrintStatement((PrintStatement) statement);
+        } else if (statement instanceof IfStatement) {
+            runIfStatement((IfStatement) statement);
+        } else if (statement instanceof ForLoop) {
+            runForLoop((ForLoop) statement);
+        } else {
+            throw new RuntimeException("Unknown statement: " + statement.getClass().getSimpleName());
         }
     }
+
 
     private Object evaluate(AST statement) {
         if (statement instanceof Num) {
@@ -61,6 +64,11 @@ public class Interpreter {
         Object value = evaluate(statement.value);
         System.out.println(value);
     }
+
+    private void runAssignment(Assignment assignment) {
+        variables.put(assignment.variableName, evaluate(assignment.value));
+    }
+
 
     private void runIfStatement(IfStatement statement) {
         Object conditionValue = evaluate(statement.condition);
@@ -99,5 +107,15 @@ public class Interpreter {
                 return !left.equals(right) ? 1.0 : 0.0;
         }
         throw new RuntimeException("Unsupported binary operation: " + statement.operator.type);
+    }
+
+    private void runForLoop(ForLoop forLoop) {
+        execute(forLoop.initialization);
+        while((Double) evaluate(forLoop.condition) != 0) {
+            for(AST statement: forLoop.block){
+                execute(statement);
+            }
+            execute(forLoop.update);
+        }
     }
 }
