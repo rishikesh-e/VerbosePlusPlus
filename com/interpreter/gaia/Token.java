@@ -2,18 +2,14 @@ package com.interpreter.gaia;
 
 public class Token {
     final TokenType type;
-    final String lexeme;
-    final Object literal;
-    final int line;
+    public String value;
 
-    Token(TokenType type, String lexeme) {
+    Token(TokenType type, String value) {
         this.type = type;
-        this.lexeme = lexeme;
-        this.literal = literal;
-        this.line = line;
+        this.value = value;
     }
 
     public String toString() {
-        return type + " " + lexeme +" " + literal;
+        return type + ": " + value;
     }
 }

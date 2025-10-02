@@ -2,8 +2,15 @@ package com.interpreter.gaia;
 
 import java.util.List;
 
-public abstract class AST {
+public abstract class AST {}
+
+class VariableAccess extends AST {
+    String name;
+    VariableAccess(String name) {
+        this.name = name;
+    }
 }
+
 
 class BinaryOperation extends AST {
     AST left;
