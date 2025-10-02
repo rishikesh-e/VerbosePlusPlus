@@ -1,4 +1,4 @@
-package com.interpreter.gaia;
+package gaia;
 
 import java.util.Map;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.interpreter.gaia;
+package gaia;
 
 public class Token {
     final TokenType type;

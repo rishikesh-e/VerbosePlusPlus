@@ -1,4 +1,4 @@
-package com.interpreter.gaia;
+package gaia;
 
 import java.util.ArrayList;
 import java.util.List;

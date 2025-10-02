@@ -1,4 +1,4 @@
-package com.interpreter.gaia;
+package gaia;
 
 public enum TokenType {
     VARIABLE, LPAREN, RPAREN, TYPE, IDENTIFIER, ASSIGN, NUMBER , STRING,
