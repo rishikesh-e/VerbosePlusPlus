@@ -1,4 +1,4 @@
-package gaia;
+package VerbosePlusPlus;
 
 public class Token {
     final TokenType type;

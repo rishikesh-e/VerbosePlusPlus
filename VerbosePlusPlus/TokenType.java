@@ -1,4 +1,4 @@
-package gaia;
+package VerbosePlusPlus;
 
 public enum TokenType {
     VARIABLE, LPAREN, RPAREN, IDENTIFIER, ASSIGN, NUMBER , STRING,

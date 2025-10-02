@@ -1,9 +1,9 @@
-package gaia;
+package VerbosePlusPlus;
 
 import java.util.List;
 import java.util.Scanner;
 
-public class GaiaShell {
+public class VerbosePlusPlusShell {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);

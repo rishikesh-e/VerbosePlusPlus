@@ -1,8 +1,8 @@
-package gaia;
+package VerbosePlusPlus;
 
 import java.util.List;
 
-public class Gaia {
+public class VerbosePlusPlus {
     public static void main(String[] args) {
         //System.out.println("Safe commit, In case of rollback");
         String code = """
