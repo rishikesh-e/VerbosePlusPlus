@@ -6,13 +6,24 @@ public class Gaia {
     public static void main(String[] args) {
         //System.out.println("Safe commit, In case of rollback");
         String code = """
-            variable(int) x := 5;
-            variable(int) y := 10;
-            if x < y {
-                terminal.print("y is greater");
-            } else {
-                terminal.print("x is greater");
-            }
+                variable(int) a := 10;
+                variable(int) b := 20;
+                variable(int) c := 15;
+                
+                if a > b {
+                    if a > c {
+                        terminal.print("a is greatest");
+                    } else {
+                        terminal.print("c is greatest");
+                    }
+                } else {
+                    if b > c {
+                        terminal.print("b is greatest");
+                    } else {
+                        terminal.print("c is greatest");
+                    }
+                }
+                
         """;
 
         Lexer lexer = new Lexer(code);
