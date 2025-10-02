@@ -45,19 +45,23 @@ public class Parser {
         return statements;
     }
 
-    public AST parseStatement() {
-        if(currentToken.type != TokenType.VARIABLE) {
-            return parseVaribaleDeclaration();
+    private AST parseStatement() {
+        if (currentToken.type == TokenType.VARIABLE) {
+            return parseVariableDeclaration();
         }
-        if(currentToken.type == TokenType.IDENTIFIER && currentToken.value.equals("terminal")) {
-            return parsePrintStatement();
-        }
-        if(currentToken.type == TokenType.IF) {
+        if (currentToken.type == TokenType.IF) {
             return parseConditional();
         }
+        if (currentToken.type == TokenType.IDENTIFIER &&
+                currentToken.value.equals("terminal")) {
+            return parsePrintStatement();
+        }
+
         throw new RuntimeException("Unexpected token " + currentToken);
     }
-    private AST parseVaribaleDeclaration() {
+
+
+    private AST parseVariableDeclaration() {
         advance();
         expected(TokenType.LPAREN);
         String type = currentToken.value;
@@ -74,23 +78,28 @@ public class Parser {
     private AST parseConditional() {
         advance();
         AST condition = parseExpression();
+
         expected(TokenType.LBRACE);
+
         List<AST> ifBranch = new ArrayList<>();
         while (currentToken.type != TokenType.RBRACE) {
             ifBranch.add(parseStatement());
         }
         expected(TokenType.RBRACE);
+
         List<AST> elseBranch = new ArrayList<>();
-        if(currentToken.type == TokenType.ELSE) {
+        if (currentToken.type == TokenType.ELSE) {
             advance();
             expected(TokenType.LBRACE);
-            while(currentToken.type != TokenType.RBRACE) {
+            while (currentToken.type != TokenType.RBRACE) {
                 elseBranch.add(parseStatement());
             }
             expected(TokenType.RBRACE);
         }
+
         return new IfStatement(condition, ifBranch, elseBranch);
     }
+
 
     private AST parseExpression() {
         AST left = parseTerm();
@@ -139,14 +148,19 @@ public class Parser {
         expected(TokenType.DOT);
         expected(TokenType.IDENTIFIER);
         expected(TokenType.LPAREN);
-        AST value = null;
+
+        AST value;
         if(currentToken.type == TokenType.STRING) {
             value = new Str(currentToken.value);
+            advance();
         } else {
             value = parseExpression();
         }
+
         expected(TokenType.RPAREN);
         expected(TokenType.SEMICOLON);
+
         return new PrintStatement(value);
     }
+
 }
