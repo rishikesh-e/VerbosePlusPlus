@@ -2,17 +2,20 @@ package VerbosePlusPlus;
 
 import java.util.List;
 
-public abstract class AST {}
+interface AST {
+    // Base interface to implement the Abstract Syntax Tree;
+}
 
-class VariableAccess extends AST {
+// Accessing the Variables
+class VariableAccess implements AST {
     public String name;
     VariableAccess(String name) {
         this.name = name;
     }
 }
 
-
-class BinaryOperation extends AST {
+// Binary operation handler =>  2 + 3 = 5
+class BinaryOperation implements AST {
     public AST left;
     public AST right;
     public Token operator;
@@ -23,7 +26,8 @@ class BinaryOperation extends AST {
     }
 }
 
-class IfStatement extends AST {
+// Handling If-Else statements
+class IfStatement implements AST {
     public AST condition;
     public List<AST> ifBranch;
     public List<AST> elseBranch;
@@ -34,28 +38,32 @@ class IfStatement extends AST {
     }
 }
 
-class Num extends AST {
+/*class Num implements AST {
     public double value;
     public Num(double value) {
         this.value = value;
     }
-}
+}*/
 
-class PrintStatement extends AST {
+// terminal.print(content to be printed);
+class PrintStatement implements AST {
     public AST value;
     public PrintStatement(AST value) {
         this.value = value;
     }
 }
 
-class Str extends AST {
+// String data type
+class StringLiteral implements AST {
     public String value;
-    public Str(String value) {
+    public StringLiteral(String value) {
         this.value = value;
     }
 }
 
-class VariableDeclaration extends AST{
+// Declaration of variable
+// variable(int) num := 3;
+class VariableDeclaration implements AST{
     public String type;
     public String name;
     public AST value;
@@ -66,7 +74,8 @@ class VariableDeclaration extends AST{
     }
 }
 
-class ForLoop extends AST {
+// Looping statements => for
+class ForLoop implements AST {
     public AST initialization;
     public AST condition;
     public AST update;
@@ -79,7 +88,8 @@ class ForLoop extends AST {
     }
 }
 
-class Assignment extends AST {
+// Assignment statements :   i : i + 1;
+class Assignment implements AST {
     public final String variableName;
     public final AST value;
 
@@ -89,11 +99,60 @@ class Assignment extends AST {
     }
 }
 
-class WhileLoop extends AST {
+// Looping statement => While loop
+class WhileLoop implements AST {
     public AST condition;
     public List<AST> block;
     public WhileLoop(AST condition, List<AST> block) {
         this.condition = condition;
         this.block = block;
+    }
+}
+
+// Boolean data type
+class BooleanLiteral implements AST {
+    public boolean value;
+    public BooleanLiteral(boolean value) {
+        this.value = value;
+    }
+}
+
+// Integer data type
+class IntegerLiteral implements AST {
+    public int value;
+    public IntegerLiteral(int value) {
+        this.value = value;
+    }
+}
+
+// Double data type
+class DoubleLiteral implements AST {
+    public int value;
+    public DoubleLiteral(int value) {
+        this.value = value;
+    }
+}
+
+// character data type
+class CharacterLiteral implements AST {
+    public char value;
+    public CharacterLiteral(char value) {
+        this.value = value;
+    }
+}
+
+// Float data type
+class FloatLiteral implements AST {
+    public float value;
+    public FloatLiteral(float value) {
+        this.value = value;
+    }
+}
+
+// Long data type
+class LongLiteral implements AST {
+    public long value;
+    public LongLiteral(long value) {
+        this.value = value;
     }
 }

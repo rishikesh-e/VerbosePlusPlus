@@ -159,7 +159,7 @@ public class Parser {
         expected(TokenType.LPAREN);
         AST value;
         if(currentToken.type == TokenType.STRING) {
-            value = new Str(currentToken.value);
+            value = new StringLiteral(currentToken.value);
             advance();
         } else {
             value = parseExpression();

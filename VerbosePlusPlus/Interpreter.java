@@ -32,8 +32,8 @@ public class Interpreter {
     private Object evaluate(AST statement) {
         if (statement instanceof Num) {
             return ((Num) statement).value;
-        } else if (statement instanceof Str) {
-            return ((Str) statement).value;
+        } else if (statement instanceof StringLiteral) {
+            return ((StringLiteral) statement).value;
         } else if (statement instanceof VariableAccess) {
             String name = ((VariableAccess) statement).name;
             if (!variables.containsKey(name)) {
