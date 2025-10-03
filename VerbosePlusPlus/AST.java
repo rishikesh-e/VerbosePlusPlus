@@ -38,12 +38,12 @@ class IfStatement implements AST {
     }
 }
 
-/*class Num implements AST {
+class Num implements AST {
     public double value;
     public Num(double value) {
         this.value = value;
     }
-}*/
+}
 
 // terminal.print(content to be printed);
 class PrintStatement implements AST {
