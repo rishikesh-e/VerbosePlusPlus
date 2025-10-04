@@ -1,8 +1,8 @@
-variable(integer) num := 4;
-variable(integer) num := 5;
-if num < num {
-    terminal.print("num2 is greater");
+variable(integer) x := 4;
+variable(integer) y := 5;
+if x < y {
+    terminal.print("x is greater");
 }
 else {
-    terminal.print("num1 is greater");
+    terminal.print("y is greater");
 }
