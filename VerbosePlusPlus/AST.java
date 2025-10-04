@@ -127,8 +127,8 @@ class IntegerLiteral implements AST {
 
 // Double data type
 class DoubleLiteral implements AST {
-    public int value;
-    public DoubleLiteral(int value) {
+    public double value;
+    public DoubleLiteral(double value) {
         this.value = value;
     }
 }

@@ -134,21 +134,49 @@ public class Parser {
     }
 
     private AST parseFactor() {
-        if (currentToken.type == TokenType.NUMBER) {
-            AST node = new Num(Double.parseDouble(currentToken.value));
-            advance();
-            return node;
-        } else if (currentToken.type == TokenType.IDENTIFIER) {
-            AST node = new VariableAccess(currentToken.value);
-            advance();
-            return node;
-        } else if (currentToken.type == TokenType.LPAREN) {
-            advance();
-            AST node = parseExpression();
-            expected(TokenType.RPAREN);
-            return node;
-        } else {
-            throw new RuntimeException("Unexpected token in expression: " + currentToken);
+        switch (currentToken.type) {
+            case INT_LITERAL -> {
+                AST literal = new IntegerLiteral(Integer.parseInt(currentToken.value));
+                advance();
+                return literal;
+            }
+            case LONG_LITERAL -> {
+                AST literal = new LongLiteral(Long.parseLong(currentToken.value));
+                advance();
+                return literal;
+            }
+            case FLOAT_LITERAL -> {
+                AST literal = new FloatLiteral(Float.parseFloat(currentToken.value));
+                advance();
+                return literal;
+            }
+            case DOUBLE_LITERAL -> {
+                AST literal = new DoubleLiteral(Double.parseDouble(currentToken.value));
+                advance();
+                return literal;
+            }
+            case CHAR_LITERAL -> {
+                AST literal = new CharacterLiteral(currentToken.value.charAt(0));
+                advance();
+                return literal;
+            }
+            case STRING_LITERAL -> {
+                AST literal = new StringLiteral(currentToken.value);
+                advance();
+                return literal;
+            }
+            case IDENTIFIER -> {
+                AST literal = new VariableAccess(currentToken.value);
+                advance();
+                return literal;
+            }
+            case LPAREN -> {
+                advance();
+                AST node = parseExpression();
+                expected(TokenType.RPAREN);
+                return node;
+            }
+            default -> throw new RuntimeException("Unexpected token " + currentToken);
         }
     }
 
@@ -158,7 +186,7 @@ public class Parser {
         expected(TokenType.IDENTIFIER);
         expected(TokenType.LPAREN);
         AST value;
-        if(currentToken.type == TokenType.STRING) {
+        if(currentToken.type == TokenType.STRING_LITERAL) {
             value = new StringLiteral(currentToken.value);
             advance();
         } else {

@@ -29,7 +29,23 @@ public class Lexer {
                 advance();
             }
             else if (Character.isDigit(currentChar)) {
-                tokens.add(new Token(TokenType.NUMBER, number()));
+                String number = number();
+                if(number.contains(".")) {
+                    tokens.add(new Token(TokenType.FLOAT_LITERAL, number));
+                } else {
+                    tokens.add(new Token(TokenType.INT_LITERAL, number));
+                }
+            }
+            else if (currentChar == '\'') {
+                advance();
+                char character = currentChar;
+                advance();
+                if(currentChar == '\'') {
+                    advance();
+                    tokens.add(new Token(TokenType.CHAR_LITERAL, String.valueOf(character)));
+                } else {
+                    throw new RuntimeException("Unexpected type: String found");
+                }
             }
             else if(Character.isLetter(currentChar)) {
                 String word = word();
@@ -39,14 +55,18 @@ public class Lexer {
                     case "else" -> tokens.add(new Token(TokenType.ELSE, word));
                     case "terminal" -> tokens.add(new Token(TokenType.IDENTIFIER, word));
                     case "for" -> tokens.add(new Token(TokenType.FOR, word));
+                    case "integer" -> tokens.add(new Token(TokenType.INT, word));
+                    case "long" -> tokens.add(new Token(TokenType.LONG, word));
+                    case "float" -> tokens.add(new Token(TokenType.FLOAT, word));
+                    case "double" -> tokens.add(new Token(TokenType.DOUBLE, word));
+                    case "character" -> tokens.add(new Token(TokenType.CHARACTER, word));
+                    case "string" -> tokens.add(new Token(TokenType.STRING_TYPE, word));
                     default -> tokens.add(new Token(TokenType.IDENTIFIER, word));
                 }
-            }
-            else if (currentChar == '.') {
+            } else if (currentChar == '.') {
                 tokens.add(new Token(TokenType.DOT, "."));
                 advance();
             }
-
             else if (currentChar == '(') { tokens.add(new Token(TokenType.LPAREN, "(")); advance(); }
             else if (currentChar == ')') { tokens.add(new Token(TokenType.RPAREN, ")")); advance(); }
             else if (currentChar == '{') { tokens.add(new Token(TokenType.LBRACE, "{")); advance(); }
@@ -56,7 +76,7 @@ public class Lexer {
                 advance();
                 if (currentChar == '=') { tokens.add(new Token(TokenType.ASSIGN, ":=")); advance(); }
             }
-            else if (currentChar == '"') { tokens.add(new Token(TokenType.STRING, string())); }
+            else if (currentChar == '"') { tokens.add(new Token(TokenType.STRING_LITERAL, string()));}
             else if (currentChar == '+') { tokens.add(new Token(TokenType.PLUS, "+")); advance(); }
             else if (currentChar == '-') { tokens.add(new Token(TokenType.MINUS, "-")); advance(); }
             else if (currentChar == '*') { tokens.add(new Token(TokenType.MUL, "*")); advance(); }
@@ -88,12 +108,26 @@ public class Lexer {
     }
 
     public String number() {
-        StringBuilder stringBuilder = new StringBuilder();
-        while(Character.isDigit(currentChar)) {
-            stringBuilder.append(currentChar);
+        StringBuilder sb = new StringBuilder();
+        while (Character.isDigit(currentChar)) {
+            sb.append(currentChar);
             advance();
         }
-        return stringBuilder.toString();
+        if (currentChar == '.') {
+            sb.append(currentChar);
+            advance();
+            while (Character.isDigit(currentChar)) {
+                sb.append(currentChar);
+                advance();
+            }
+        }
+        if (currentChar == 'f' || currentChar == 'F' ||
+                currentChar == 'd' || currentChar == 'D' ||
+                currentChar == 'l' || currentChar == 'L') {
+            sb.append(currentChar);
+            advance();
+        }
+        return sb.toString();
     }
 
     public String string() {
