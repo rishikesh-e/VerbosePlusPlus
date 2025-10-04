@@ -1,31 +1,17 @@
 package VerbosePlusPlus;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class VerbosePlusPlus {
-    public static void main(String[] args) {
-        //System.out.println("Safe commit, In case of rollback");
-        String code = """
-                variable(integer) a := 10;
-                variable(integer) b := 20;
-                variable(integer) c := 15;
-                if a > b {
-                    if a > c {
-                        terminal.print("a is greatest");
-                    } else {
-                        terminal.print("c is greatest");
-                    }
-                } else {
-                    if b > c {
-                        terminal.print("b is greatest");
-                    } else {
-                        terminal.print("c is greatest");
-                    }
-                }
-                for(variable(integer) i := 1; i < 5; i := i + 1) {
-                    terminal.print(i + 2.7594839390);
-                }
-        """;
+    public static void main(String[] args) throws Exception {
+        if (args.length < 1) {
+            System.out.println("Usage: verbose++ <file.vpp>");
+            return;
+        }
+
+        String code = Files.readString(Paths.get(args[0]));
 
         Lexer lexer = new Lexer(code);
         List<Token> tokens = lexer.tokenize();

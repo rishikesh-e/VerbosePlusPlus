@@ -132,7 +132,6 @@ class DoubleLiteral implements AST {
         this.value = value;
     }
 }
-
 // character data type
 class CharacterLiteral implements AST {
     public char value;

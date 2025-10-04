@@ -1,0 +1,2 @@
+
+java -jar /opt/verbosepp/verbosepp.jar "$@"

@@ -165,6 +165,11 @@ public class Parser {
                 advance();
                 return literal;
             }
+            case BOOLEAN_LITERAL -> {
+                AST literal = new BooleanLiteral(currentToken.value.equals("true"));
+                advance();
+                return literal;
+            }
             case IDENTIFIER -> {
                 AST literal = new VariableAccess(currentToken.value);
                 advance();

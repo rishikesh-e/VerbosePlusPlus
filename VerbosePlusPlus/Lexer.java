@@ -61,6 +61,8 @@ public class Lexer {
                     case "double" -> tokens.add(new Token(TokenType.DOUBLE, word));
                     case "character" -> tokens.add(new Token(TokenType.CHARACTER, word));
                     case "string" -> tokens.add(new Token(TokenType.STRING_TYPE, word));
+                    case "boolean" -> tokens.add(new Token(TokenType.BOOLEAN, word));
+                    case "true", "false" -> tokens.add(new Token(TokenType.BOOLEAN_LITERAL, word));
                     default -> tokens.add(new Token(TokenType.IDENTIFIER, word));
                 }
             } else if (currentChar == '.') {
