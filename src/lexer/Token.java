@@ -1,15 +1,20 @@
-package VerbosePlusPlus;
+package lexer;
 
 public class Token {
-    final TokenType type;
-    public String value;
+    public final TokenType type;
+    public final String value;
+    public final int line;
+    public final int column;
 
-    Token(TokenType type, String value) {
+    public Token(TokenType type, String value, int row, int column) {
         this.type = type;
         this.value = value;
+        this.line = row;
+        this.column = column;
     }
 
+    @Override
     public String toString() {
-        return type + ": " + value;
+        return type + "('" + value + "') at [" + line + ", " + column + "]";
     }
 }

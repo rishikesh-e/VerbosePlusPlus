@@ -1,11 +1,13 @@
 package main;
 
+import exceptions.VerboseException;
 import interpreter.Interpreter;
 import lexer.Lexer;
 import lexer.Token;
 import parser.AST;
 import parser.Parser;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -17,15 +19,22 @@ public class VerbosePlusPlus {
             return;
         }
 
-        String code = Files.readString(Paths.get(args[0]));
+        try {
+            String code = Files.readString(Paths.get(args[0]));
 
-        Lexer lexer = new Lexer(code);
-        List<Token> tokens = lexer.tokenize();
+            Lexer lexer = new Lexer(code);
+            List<Token> tokens = lexer.tokenize();
 
-        Parser parser = new Parser(tokens);
-        List<AST> program = parser.parseCode();
+            Parser parser = new Parser(tokens);
+            List<AST> program = parser.parseCode();
 
-        Interpreter interpreter = new Interpreter();
-        interpreter.interpret(program);
+            Interpreter interpreter = new Interpreter();
+            interpreter.interpret(program);
+        } catch (VerboseException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

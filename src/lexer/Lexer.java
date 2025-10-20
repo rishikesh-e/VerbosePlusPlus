@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lexer {
-    private String text;
+    private final String text;
     private int pos = 0;
     private char currentChar;
     private int line = 1;
@@ -16,8 +16,14 @@ public class Lexer {
     }
 
     private void advance() {
+        if (currentChar == '\n') {
+            line++;
+            column = 1;
+        } else {
+            column++;
+        }
+
         pos++;
-        column++;
         if (pos < text.length()) {
             currentChar = text.charAt(pos);
         } else {
@@ -25,95 +31,95 @@ public class Lexer {
         }
     }
 
-    private void newLine() {
-        line++;
-        column = 1;
-    }
-
     public List<Token> tokenize() {
         List<Token> tokens = new ArrayList<>();
+
         while (currentChar != '\0') {
             if (Character.isWhitespace(currentChar)) {
-                if (currentChar == '\n') {
-                    newLine();
-                }
                 advance();
-            }
-            else if (Character.isDigit(currentChar)) {
-                String number = number();
-                if (number.contains(".")) {
-                    tokens.add(new Token(TokenType.FLOAT_LITERAL, number, line, column));
-                } else {
-                    tokens.add(new Token(TokenType.INT_LITERAL, number, line, column));
-                }
-            }
-            else if (currentChar == '\'') {
+            } else if (Character.isDigit(currentChar)) {
+                int startColumn = column;
+                String num = number();
+                TokenType type = num.contains(".") ? TokenType.FLOAT_LITERAL : TokenType.INT_LITERAL;
+                tokens.add(new Token(type, num, line, startColumn));
+            } else if (currentChar == '\'') {
+                int startColumn = column;
                 advance();
                 char character = currentChar;
                 advance();
                 if (currentChar == '\'') {
                     advance();
-                    tokens.add(new Token(TokenType.CHAR_LITERAL, String.valueOf(character), line, column));
+                    tokens.add(new Token(TokenType.CHAR_LITERAL, String.valueOf(character), line, startColumn));
                 } else {
-                    throw new RuntimeException("Unterminated character literal at line " + line + ", column " + column);
+                    throw new RuntimeException("Unterminated character literal at line " + line + ", column " + startColumn);
                 }
-            }
-            else if (Character.isLetter(currentChar)) {
+            } else if (Character.isLetter(currentChar)) {
+                int startColumn = column;
                 String word = word();
-                switch (word) {
-                    case "variable" -> tokens.add(new Token(TokenType.VARIABLE, word, line, column));
-                    case "if" -> tokens.add(new Token(TokenType.IF, word, line, column));
-                    case "else" -> tokens.add(new Token(TokenType.ELSE, word, line, column));
-                    case "terminal" -> tokens.add(new Token(TokenType.IDENTIFIER, word, line, column));
-                    case "for" -> tokens.add(new Token(TokenType.FOR, word, line, column));
-                    case "integer" -> tokens.add(new Token(TokenType.INT, word, line, column));
-                    case "long" -> tokens.add(new Token(TokenType.LONG, word, line, column));
-                    case "float" -> tokens.add(new Token(TokenType.FLOAT, word, line, column));
-                    case "double" -> tokens.add(new Token(TokenType.DOUBLE, word, line, column));
-                    case "character" -> tokens.add(new Token(TokenType.CHARACTER, word, line, column));
-                    case "string" -> tokens.add(new Token(TokenType.STRING_TYPE, word, line, column));
-                    case "boolean" -> tokens.add(new Token(TokenType.BOOLEAN, word, line, column));
-                    case "true", "false" -> tokens.add(new Token(TokenType.BOOLEAN_LITERAL, word, line, column));
-                    default -> tokens.add(new Token(TokenType.IDENTIFIER, word, line, column));
+                TokenType type = switch (word) {
+                    case "variable" -> TokenType.VARIABLE;
+                    case "if" -> TokenType.IF;
+                    case "else" -> TokenType.ELSE;
+                    case "terminal" -> TokenType.IDENTIFIER;
+                    case "for" -> TokenType.FOR;
+                    case "integer" -> TokenType.INT;
+                    case "long" -> TokenType.LONG;
+                    case "float" -> TokenType.FLOAT;
+                    case "double" -> TokenType.DOUBLE;
+                    case "character" -> TokenType.CHARACTER;
+                    case "string" -> TokenType.STRING_TYPE;
+                    case "boolean" -> TokenType.BOOLEAN;
+                    case "true", "false" -> TokenType.BOOLEAN_LITERAL;
+                    default -> TokenType.IDENTIFIER;
+                };
+                tokens.add(new Token(type, word, line, startColumn));
+            } else {
+                int startColumn = column;
+                switch (currentChar) {
+                    case '.' -> { tokens.add(new Token(TokenType.DOT, ".", line, startColumn)); advance(); }
+                    case '(' -> { tokens.add(new Token(TokenType.LPAREN, "(", line, startColumn)); advance(); }
+                    case ')' -> { tokens.add(new Token(TokenType.RPAREN, ")", line, startColumn)); advance(); }
+                    case '{' -> { tokens.add(new Token(TokenType.LBRACE, "{", line, startColumn)); advance(); }
+                    case '}' -> { tokens.add(new Token(TokenType.RBRACE, "}", line, startColumn)); advance(); }
+                    case ';' -> { tokens.add(new Token(TokenType.SEMICOLON, ";", line, startColumn)); advance(); }
+                    case ':' -> {
+                        advance();
+                        if (currentChar == '=') {
+                            tokens.add(new Token(TokenType.ASSIGN, ":=", line, startColumn));
+                            advance();
+                        }
+                    }
+                    case '"' -> {
+                        String str = string();
+                        tokens.add(new Token(TokenType.STRING_LITERAL, str, line, startColumn));
+                    }
+                    case '+' -> { tokens.add(new Token(TokenType.PLUS, "+", line, startColumn)); advance(); }
+                    case '-' -> { tokens.add(new Token(TokenType.MINUS, "-", line, startColumn)); advance(); }
+                    case '*' -> { tokens.add(new Token(TokenType.MUL, "*", line, startColumn)); advance(); }
+                    case '/' -> { tokens.add(new Token(TokenType.DIV, "/", line, startColumn)); advance(); }
+                    case '>' -> {
+                        advance();
+                        if (currentChar == '=') { tokens.add(new Token(TokenType.GTE, ">=", line, startColumn)); advance(); }
+                        else tokens.add(new Token(TokenType.GT, ">", line, startColumn));
+                    }
+                    case '<' -> {
+                        advance();
+                        if (currentChar == '=') { tokens.add(new Token(TokenType.LTE, "<=", line, startColumn)); advance(); }
+                        else tokens.add(new Token(TokenType.LT, "<", line, startColumn));
+                    }
+                    case '=' -> {
+                        advance();
+                        if (currentChar == '=') { tokens.add(new Token(TokenType.EQ, "==", line, startColumn)); advance(); }
+                    }
+                    case '!' -> {
+                        advance();
+                        if (currentChar == '=') { tokens.add(new Token(TokenType.NEQ, "!=", line, startColumn)); advance(); }
+                    }
+                    default -> advance();
                 }
-            }
-            else if (currentChar == '.') { tokens.add(new Token(TokenType.DOT, ".", line, column)); advance(); }
-            else if (currentChar == '(') { tokens.add(new Token(TokenType.LPAREN, "(", line, column)); advance(); }
-            else if (currentChar == ')') { tokens.add(new Token(TokenType.RPAREN, ")", line, column)); advance(); }
-            else if (currentChar == '{') { tokens.add(new Token(TokenType.LBRACE, "{", line, column)); advance(); }
-            else if (currentChar == '}') { tokens.add(new Token(TokenType.RBRACE, "}", line, column)); advance(); }
-            else if (currentChar == ';') { tokens.add(new Token(TokenType.SEMICOLON, ";", line, column)); advance(); }
-            else if (currentChar == ':') {
-                advance();
-                if (currentChar == '=') { tokens.add(new Token(TokenType.ASSIGN, ":=", line, column)); advance(); }
-            }
-            else if (currentChar == '"') { tokens.add(new Token(TokenType.STRING_LITERAL, string(), line, column)); }
-            else if (currentChar == '+') { tokens.add(new Token(TokenType.PLUS, "+", line, column)); advance(); }
-            else if (currentChar == '-') { tokens.add(new Token(TokenType.MINUS, "-", line, column)); advance(); }
-            else if (currentChar == '*') { tokens.add(new Token(TokenType.MUL, "*", line, column)); advance(); }
-            else if (currentChar == '/') { tokens.add(new Token(TokenType.DIV, "/", line, column)); advance(); }
-            else if (currentChar == '>') {
-                advance();
-                if (currentChar == '=') { tokens.add(new Token(TokenType.GTE, ">=", line, column)); advance(); }
-                else tokens.add(new Token(TokenType.GT, ">", line, column));
-            }
-            else if (currentChar == '<') {
-                advance();
-                if (currentChar == '=') { tokens.add(new Token(TokenType.LTE, "<=", line, column)); advance(); }
-                else tokens.add(new Token(TokenType.LT, "<", line, column));
-            }
-            else if (currentChar == '=') {
-                advance();
-                if (currentChar == '=') { tokens.add(new Token(TokenType.EQ, "==", line, column)); advance(); }
-            }
-            else if (currentChar == '!') {
-                advance();
-                if (currentChar == '=') { tokens.add(new Token(TokenType.NEQ, "!=", line, column)); advance(); }
-            }
-            else {
-                advance();
             }
         }
+
         tokens.add(new Token(TokenType.EOF, "", line, column));
         return tokens;
     }
@@ -132,9 +138,7 @@ public class Lexer {
                 advance();
             }
         }
-        if (currentChar == 'f' || currentChar == 'F' ||
-                currentChar == 'd' || currentChar == 'D' ||
-                currentChar == 'l' || currentChar == 'L') {
+        if ("fFdDlL".indexOf(currentChar) != -1) {
             sb.append(currentChar);
             advance();
         }
@@ -143,21 +147,21 @@ public class Lexer {
 
     private String string() {
         advance();
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         while (currentChar != '"' && currentChar != '\0') {
-            stringBuilder.append(currentChar);
+            sb.append(currentChar);
             advance();
         }
         advance();
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private String word() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         while (Character.isLetter(currentChar)) {
-            stringBuilder.append(currentChar);
+            sb.append(currentChar);
             advance();
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 }
