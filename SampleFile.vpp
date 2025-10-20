@@ -1,0 +1,8 @@
+variable(integer) x := 4;
+variable(integer) y := 5;
+if x < y {
+    terminal.print("x is greater");
+}
+else {
+    terminal.print("y is greater");
+}

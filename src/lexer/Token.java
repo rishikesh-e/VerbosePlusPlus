@@ -1,10 +1,10 @@
-package lexer;
+package VerbosePlusPlus;
 
 public class Token {
-    public final TokenType type;
+    final TokenType type;
     public String value;
 
-    public Token(TokenType type, String value) {
+    Token(TokenType type, String value) {
         this.type = type;
         this.value = value;
     }

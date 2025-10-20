@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
-    private List<Token> tokens;
+    private final List<Token> tokens;
     private int position = 0;
     Token currentToken;
 
@@ -18,15 +18,15 @@ public class Parser {
 
     public void advance() {
         position++;
-        if(position < tokens.size()) {
+        if (position < tokens.size()) {
             currentToken = tokens.get(position);
         } else {
-            currentToken = new Token(TokenType.EOF, "");
+            currentToken = new Token(TokenType.EOF, "", currentToken.line, currentToken.column);
         }
     }
 
     public boolean match(TokenType type) {
-        if(currentToken.type == type) {
+        if (currentToken.type == type) {
             advance();
             return true;
         }
@@ -34,15 +34,18 @@ public class Parser {
     }
 
     public void expected(TokenType type) {
-        if(!match(type)) {
-            throw new RuntimeException("Expected " + type + " but got " + currentToken);
+        if (!match(type)) {
+            throw new SyntaxErrorException(
+                    "Expected " + type + " but got " + currentToken.type,
+                    currentToken.line,
+                    currentToken.column
+            );
         }
-        return;
     }
 
     public List<AST> parseCode() {
         List<AST> statements = new ArrayList<>();
-        while(currentToken.type != TokenType.EOF) {
+        while (currentToken.type != TokenType.EOF) {
             statements.add(parseStatement());
         }
         return statements;
@@ -62,7 +65,10 @@ public class Parser {
         if (currentToken.type == TokenType.FOR) {
             return parseForLoop();
         }
-        throw new RuntimeException("Unexpected token " + currentToken);
+        throw new SyntaxErrorException("Unexpected token : " + currentToken.type,
+                currentToken.line,
+                currentToken.column
+        );
     }
 
     private AST parseVariableDeclaration() {
@@ -71,12 +77,33 @@ public class Parser {
         String type = currentToken.value;
         advance();
         expected(TokenType.RPAREN);
+
         String name = currentToken.value;
+        if (isKeyword(name)) {
+            throw new IdentifierWithKeywordNameException(
+                    name,
+                    currentToken.line,
+                    currentToken.column
+            );
+        }
         advance();
+
         expected(TokenType.ASSIGN);
         AST value = parseExpression();
         expected(TokenType.SEMICOLON);
+
         return new VariableDeclaration(type, name, value);
+    }
+
+    private boolean isKeyword(String name) {
+        if(name.equals("true") || name.equals("false") || name.equals("integer") ||
+                name.equals("float") || name.equals("long") || name.equals("double") ||
+                      name.equals("string") || name.equals("boolean") || name.equals("terminal") ||
+                            name.equals("variable") || name.equals("for") || name.equals("print") ||
+                                name.equals("if") || name.equals("else")) {
+            return true;
+        }
+        return false;
     }
 
     private AST parseVariableDeclarationForLoop() {
@@ -85,8 +112,17 @@ public class Parser {
         String type = currentToken.value;
         advance();
         expected(TokenType.RPAREN);
+
         String name = currentToken.value;
+        if (isKeyword(name)) {
+            throw new IdentifierWithKeywordNameException(
+                    name,
+                    currentToken.line,
+                    currentToken.column
+            );
+        }
         advance();
+
         expected(TokenType.ASSIGN);
         AST value = parseExpression();
         return new VariableDeclaration(type, name, value);
@@ -96,11 +132,13 @@ public class Parser {
         advance();
         AST condition = parseExpression();
         expected(TokenType.LBRACE);
+
         List<AST> ifBranch = new ArrayList<>();
         while (currentToken.type != TokenType.RBRACE) {
             ifBranch.add(parseStatement());
         }
         expected(TokenType.RBRACE);
+
         List<AST> elseBranch = new ArrayList<>();
         if (currentToken.type == TokenType.ELSE) {
             advance();
@@ -115,9 +153,9 @@ public class Parser {
 
     private AST parseExpression() {
         AST left = parseTerm();
-        while(currentToken.type == TokenType.PLUS || currentToken.type == TokenType.MINUS ||
-                currentToken.type == TokenType.EQ || currentToken.type == TokenType.NEQ ||
-                currentToken.type == TokenType.LT || currentToken.type == TokenType.GT) {
+        while (currentToken.type == TokenType.PLUS || currentToken.type == TokenType.MINUS ||
+                currentToken.type == TokenType.EQ   || currentToken.type == TokenType.NEQ ||
+                currentToken.type == TokenType.LT   || currentToken.type == TokenType.GT) {
             Token operation = currentToken;
             advance();
             AST right = parseTerm();
@@ -129,7 +167,8 @@ public class Parser {
     private AST parseTerm() {
         AST left = parseFactor();
         while (currentToken.type == TokenType.MUL || currentToken.type == TokenType.DIV) {
-            Token operation = currentToken; advance();
+            Token operation = currentToken;
+            advance();
             AST right = parseFactor();
             left = new BinaryOperation(left, right, operation);
         }
@@ -168,6 +207,11 @@ public class Parser {
                 advance();
                 return literal;
             }
+            case BOOLEAN_LITERAL -> {
+                AST literal = new BooleanLiteral(currentToken.value.equals("true"));
+                advance();
+                return literal;
+            }
             case IDENTIFIER -> {
                 AST literal = new VariableAccess(currentToken.value);
                 advance();
@@ -179,7 +223,11 @@ public class Parser {
                 expected(TokenType.RPAREN);
                 return node;
             }
-            default -> throw new RuntimeException("Unexpected token " + currentToken);
+            default -> throw new SyntaxErrorException(
+                    "Unexpected token in expression: " + currentToken.type,
+                    currentToken.line,
+                    currentToken.column
+            );
         }
     }
 
@@ -188,13 +236,15 @@ public class Parser {
         expected(TokenType.DOT);
         expected(TokenType.IDENTIFIER);
         expected(TokenType.LPAREN);
+
         AST value;
-        if(currentToken.type == TokenType.STRING_LITERAL) {
+        if (currentToken.type == TokenType.STRING_LITERAL) {
             value = new StringLiteral(currentToken.value);
             advance();
         } else {
             value = parseExpression();
         }
+
         expected(TokenType.RPAREN);
         expected(TokenType.SEMICOLON);
         return new PrintStatement(value);
@@ -203,18 +253,23 @@ public class Parser {
     private AST parseForLoop() {
         advance();
         expected(TokenType.LPAREN);
+
         AST initialization = parseVariableDeclarationForLoop();
         expected(TokenType.SEMICOLON);
+
         AST condition = parseExpression();
         expected(TokenType.SEMICOLON);
+
         AST update = parseAssignmentForLoop();
         expected(TokenType.RPAREN);
+
         expected(TokenType.LBRACE);
         List<AST> block = new ArrayList<>();
-        while(currentToken.type != TokenType.RBRACE) {
+        while (currentToken.type != TokenType.RBRACE) {
             block.add(parseStatement());
         }
         expected(TokenType.RBRACE);
+
         return new ForLoop(initialization, condition, update, block);
     }
 
