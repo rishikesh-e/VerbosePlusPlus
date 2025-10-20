@@ -1,4 +1,4 @@
-package VerbosePlusPlus;
+package lexer;
 
 public enum TokenType {
     INT, LONG, FLOAT, DOUBLE, STRING_TYPE, CHARACTER,

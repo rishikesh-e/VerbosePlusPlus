@@ -1,13 +1,13 @@
-package VerbosePlusPlus;
+package interpreter;
 
 import java.util.Map;
 import java.util.HashMap;
 
 public class SymbolTable {
-    Map<String, String> types = new HashMap<>();
-    Map<String, Object> values = new HashMap<>();
+    private Map<String, String> types = new HashMap<>();
+    private Map<String, Object> values = new HashMap<>();
 
-    void declare(String name, String type, Object value) {
+    public void declare(String name, String type, Object value) {
         if(types.containsKey(name)) {
             throw new RuntimeException("Varibale already defined");
         }
@@ -15,7 +15,7 @@ public class SymbolTable {
         values.put(name, value);
     }
 
-    void assign(String name, Object value, String type) {
+    public void assign(String name, Object value, String type) {
         if(!types.containsKey(name)) {
             throw new RuntimeException("Varibale not defined");
         }
@@ -25,14 +25,14 @@ public class SymbolTable {
         values.put(name, value);
     }
 
-    Object get(String name) {
+    public Object get(String name) {
         if(!values.containsKey(name)) {
             throw new RuntimeException("Varibale not defined");
         }
         return values.get(name);
     }
 
-    String getType(String name) {
+    public String getType(String name) {
         if(!types.containsKey(name)) {
             throw new RuntimeException("Varibale not defined");
         }

@@ -1,5 +1,7 @@
-package VerbosePlusPlus;
+package interpreter;
 
+import parser.*;
+import lexer.*;
 import java.util.*;
 
 public class Interpreter {
@@ -142,40 +144,40 @@ public class Interpreter {
         if (left.getClass() == right.getClass()) {
             if (left instanceof Integer li && right instanceof Integer ri) {
                 switch (statement.operator.type) {
-                    case PLUS: return li + ri;
-                    case MINUS: return li - ri;
-                    case MUL: return li * ri;
-                    case DIV:
+                    case TokenType.PLUS: return li + ri;
+                    case TokenType.MINUS: return li - ri;
+                    case TokenType.MUL: return li * ri;
+                    case TokenType.DIV:
                         if (ri == 0) throw new RuntimeException("Division by zero");
                         return li / ri;
                 }
             }
             if (left instanceof Long ll && right instanceof Long rl) {
                 switch (statement.operator.type) {
-                    case PLUS: return ll + rl;
-                    case MINUS: return ll - rl;
-                    case MUL: return ll * rl;
-                    case DIV:
+                    case TokenType.PLUS: return ll + rl;
+                    case TokenType.MINUS: return ll - rl;
+                    case TokenType.MUL: return ll * rl;
+                    case TokenType.DIV:
                         if (rl == 0L) throw new RuntimeException("Division by zero");
                         return ll / rl;
                 }
             }
             if (left instanceof Float lf && right instanceof Float rf) {
                 switch (statement.operator.type) {
-                    case PLUS: return lf + rf;
-                    case MINUS: return lf - rf;
-                    case MUL: return lf * rf;
-                    case DIV:
+                    case TokenType.PLUS: return lf + rf;
+                    case TokenType.MINUS: return lf - rf;
+                    case TokenType.MUL: return lf * rf;
+                    case TokenType.DIV:
                         if (rf == 0f) throw new RuntimeException("Division by zero");
                         return lf / rf;
                 }
             }
             if (left instanceof Double ld && right instanceof Double rd) {
                 switch (statement.operator.type) {
-                    case PLUS: return ld + rd;
-                    case MINUS: return ld - rd;
-                    case MUL: return ld * rd;
-                    case DIV:
+                    case TokenType.PLUS: return ld + rd;
+                    case TokenType.MINUS: return ld - rd;
+                    case TokenType.MUL: return ld * rd;
+                    case TokenType.DIV:
                         if (rd == 0.0) throw new RuntimeException("Division by zero");
                         return ld / rd;
                 }
@@ -187,16 +189,16 @@ public class Interpreter {
         double r = ((Number) right).doubleValue();
 
         switch (statement.operator.type) {
-            case PLUS: return l + r;
-            case MINUS: return l - r;
-            case MUL: return l * r;
-            case DIV:
+            case TokenType.PLUS: return l + r;
+            case TokenType.MINUS: return l - r;
+            case TokenType.MUL: return l * r;
+            case TokenType.DIV:
                 if (r == 0.0) throw new RuntimeException("Division by zero");
                 return l / r;
-            case GT: return l > r ? 1 : 0;
-            case LT: return l < r ? 1 : 0;
-            case EQ: return l == r ? 1 : 0;
-            case NEQ: return l != r ? 1 : 0;
+            case TokenType.GT: return l > r ? 1 : 0;
+            case TokenType.LT: return l < r ? 1 : 0;
+            case TokenType.EQ: return l == r ? 1 : 0;
+            case TokenType.NEQ: return l != r ? 1 : 0;
         }
 
         throw new RuntimeException("Unsupported binary operation: " + statement.operator.type);

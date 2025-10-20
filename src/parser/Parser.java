@@ -1,4 +1,7 @@
-package VerbosePlusPlus;
+package parser;
+
+import lexer.Token;
+import lexer.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +11,7 @@ public class Parser {
     private int position = 0;
     Token currentToken;
 
-    Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens) {
         this.tokens = tokens;
         this.currentToken = tokens.get(position);
     }

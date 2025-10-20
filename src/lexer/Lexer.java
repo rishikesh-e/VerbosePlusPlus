@@ -1,4 +1,4 @@
-package VerbosePlusPlus;
+package lexer;
 
 import java.util.ArrayList;
 import java.util.List;

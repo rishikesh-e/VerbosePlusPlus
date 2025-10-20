@@ -1,4 +1,10 @@
-package VerbosePlusPlus;
+package main;
+
+import interpreter.Interpreter;
+import lexer.Lexer;
+import lexer.Token;
+import parser.AST;
+import parser.Parser;
 
 import java.util.List;
 
